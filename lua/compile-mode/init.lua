@@ -5,6 +5,7 @@
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
+local paths = require("compile-mode.paths")
 local utils = require("compile-mode.utils")
 local colors = require("compile-mode.colors")
 
@@ -63,6 +64,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 	debug("== runjob() ==")
 
 	local count = 0
+	local current_path = ""
 
 	local on_either = a.void(function(_, data)
 		if not data or #data < 1 or (#data == 1 and data[1] == "") then
@@ -74,6 +76,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 		local linecount = vim.api.nvim_buf_line_count(bufnr)
 		for i, line in ipairs(data) do
 			local error = errors.parse(line)
+			current_path = paths.parse(line)
 
 			if config.compilation_hidden_output then
 				local hide
